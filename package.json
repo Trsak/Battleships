@@ -1,0 +1,19 @@
+{
+  "name": "battleships",
+  "version": "1.0.0",
+  "description": "ITU Project by Petr Sopf",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Petr Sopf",
+  "license": "ISC",
+  "dependencies": {
+    "bulma": "^0.6.0",
+    "express": "^4.16.2",
+    "file-system": "^2.2.2",
+    "socket.io": "^2.0.3"
+  },
+  "devDependencies": {}
+}
