@@ -20,10 +20,8 @@ app.get('/', function (req, res) {
 app.use('/', express.static(__dirname + '/client'));
 
 server.listen(port, function () {
-    console.log('https server running on port ' + port);
+    console.log('Battleships game running on port ' + port);
 });
-
-var SOCKET_LIST = {};
 
 var count = 0;
 
@@ -40,23 +38,3 @@ io.sockets.on('connection', function (socket) {
         });
     });
 });
-/*
-setInterval(function () {
-    var pack = [];
-    for (var i in SOCKET_LIST) {
-        var socket = SOCKET_LIST[i];
-        socket.x++;
-        socket.y++;
-        pack.push({
-            x: socket.x,
-            y: socket.y,
-            number: socket.number
-        });
-    }
-
-    for (var i in SOCKET_LIST) {
-
-        var socket = SOCKET_LIST[i];
-        socket.emit("newPositions", pack);
-    }
-}, 1000/25);*/
