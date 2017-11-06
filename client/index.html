@@ -4,45 +4,88 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Battleships</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
-          integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" href="animate.min.css">
+    <link rel="stylesheet" href="toastr.min.css">
+    <link rel="stylesheet" href="rangeslider.css">
     <link href="style.css" rel="stylesheet">
 </head>
 <body>
-
-<div class="site-wrapper">
-
-    <div class="site-wrapper-inner">
-
-        <div class="cover-container">
-
-            <header class="masthead clearfix text-center">
-                <div class="inner">
-                    <h1 class="masthead-brand">Battleships</h1>
+<div class="container-fluid main-menu">
+    <div class="row-fluid">
+        <div class="centering text-center">
+            <div class="row justify-content-center">
+                <div class="col-md-5">
+                    <a href="#" class="btn btn-primary btn-lg" data-toggle="modal"
+                       data-target="#newGameModal">New game</a>
                 </div>
-            </header>
-
-            <main role="main" class="inner cover">
-                <p class="lead">
-                    <a href="#" class="btn btn-lg btn-secondary full-width">Play now</a>
-                </p>
-                <p class="lead">
-                    <a href="#" class="btn btn-lg btn-secondary">Settings</a>
-                </p>
-            </main>
-
-            <footer class="mastfoot">
-                <div class="inner">
-                    <p>Currently <span id="online"></span> online players.</p>
-                    <p>Created by <a href="https://psopf.cz/">Petr Šopf</a></p>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-md-5">
+                    <a href="#" class="btn btn-info btn-lg" data-toggle="modal"
+                       data-target="#settingsModal">Settings</a>
                 </div>
-            </footer>
-
+            </div>
         </div>
-
     </div>
-
 </div>
+
+<div class="modal fade" id="newGameModal" tabindex="-1" role="dialog" aria-labelledby="newGameModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <a href="#">
+                    <div class="row justify-content-center">
+                        <div class="col text-center">Random opponent</div>
+                    </div>
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="#">
+                    <div class="row justify-content-center">
+                        <div class="col text-center">Play against friend</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="settingsModal" tabindex="-1" role="dialog" aria-labelledby="settingsModalLabel"
+     aria-hidden="true" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="settingsModalLabel">Settings</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="settingsForm">
+                    <div class="form-group">
+                        <label for="settingsUsername" class="col-form-label">Username</label>
+                        <input type="text" class="form-control" id="settingsUsername">
+                    </div>
+                    <div class="form-group">
+                        <label for="settingsSoundVolume" class="col-form-label">Sound volume</label>
+                        <input type="range" id="settingsSoundVolume">
+                    </div>
+                    <label class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="settingsMuteSounds">
+                        <span class="custom-control-indicator"></span>
+                        <span class="custom-control-description">Mute sounds</span>
+                    </label>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="settingsSave">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"
@@ -51,6 +94,12 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"
         integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
         crossorigin="anonymous"></script>
-<script src="/main.js"></script>
+<script src="./rangeslider.min.js"></script>
+<script src="./toastr.min.js"></script>
+<script src="./settings.js"></script>
+<script src="./main.js"></script>
+<script type="text/javascript">
+    $('input[type="range"]').rangeslider({polyfill: false});
+</script>
 </body>
 </html>
