@@ -92,6 +92,24 @@ html, body {
     text-decoration: none;
 }
 
+#holdon-content {
+    width: 400px;
+    margin: -76px 0 0 -200px;
+    font-size: 32px;
+}
+
+#holdon-overlay {
+    opacity: 1;
+}
+
+#holdon-message {
+    top: 55%;
+}
+
+.searchingTime {
+    font-size: 44px;
+}
+
 @media (max-width: 768px) {
     .modal-dialog {
         min-height: calc(100vh - 20px);
