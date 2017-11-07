@@ -46,18 +46,17 @@ sio.sockets.on("connection", function (socket) {
         socketSession.username = "Player #" + playersTotal;
         socketSession.settingsMuteSounds = true;
         socketSession.settingsSoundVolume = 80;
+        socketSession.color = "#5484ed";
         socketSession.save();
     }
 
     socket.emit('connected', {data: socketSession});
 
     socket.on('settingsChanged', function (data) {
-        console.log(data.username);
-        console.log(data.muteSounds);
-        console.log(data.soundVolume);
         socketSession.username = data.username;
         socketSession.settingsMuteSounds = data.muteSounds;
         socketSession.settingsSoundVolume = data.soundVolume;
+        socketSession.color = data.color;
         socketSession.save();
     });
 });

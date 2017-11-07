@@ -1,24 +1,41 @@
 var userData = null;
 
-function setupSettingsModal() {
+$("#settingsOpen").click(function () {
     $("#settingsUsername").val(userData.username);
     $("#settingsSoundVolume").val(userData.settingsSoundVolume).change();
-    $("#settingsMuteSounds").attr("checked", userData.settingsMuteSounds);
-}
+    $("#settingsColor").val(userData.color).change();
+
+
+    var muteSoundsCheckbox = $("#settingsMuteSounds");
+
+    if (userData.settingsMuteSounds) {
+        muteSoundsCheckbox.find('span').addClass('checked');
+        muteSoundsCheckbox.prop('checked', true);
+    }
+    else {
+        muteSoundsCheckbox.find('span').removeClass('checked');
+        muteSoundsCheckbox.prop('checked', false);
+    }
+});
 
 $(function () {
     var socket = io({transports: ['websocket'], upgrade: false});
 
     socket.on('connected', function (sessionData) {
         userData = sessionData.data;
-        setupSettingsModal();
     });
 
     $("#settingsSave").click(function () {
+        userData.username = $("#settingsUsername").val();
+        userData.settingsSoundVolume = $("#settingsSoundVolume").val();
+        userData.settingsMuteSounds = $("#settingsMuteSounds").is(":checked");
+        userData.color = $("#settingsColor").val();
+
         socket.emit('settingsChanged', {
-            username: $("#settingsUsername").val(),
-            soundVolume: $("#settingsSoundVolume").val(),
-            muteSounds: $("#settingsMuteSounds").is(":checked")
+            username: userData.username,
+            soundVolume: userData.soundVolume,
+            muteSounds: userData.muteSounds,
+            color: userData.color
         });
         toastr.success("Settings successfully saved.");
     });
