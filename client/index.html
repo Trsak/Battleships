@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Battleships</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#2ec3ed">
+    <meta name="theme-color" content="#ffffff">
+
+    <link href="https://fonts.googleapis.com/css?family=Baloo+Tamma" rel="stylesheet">
     <link rel="stylesheet" href="bootstrap.min.css">
     <link rel="stylesheet" href="animate.min.css">
     <link rel="stylesheet" href="toastr.min.css">
@@ -13,9 +21,14 @@
     <link href="style.css" rel="stylesheet">
 </head>
 <body>
-<div class="container-fluid main-menu">
+<div class="container-fluid" id="mainMenu" >
     <div class="row-fluid">
         <div class="centering text-center">
+            <div class="row justify-content-center">
+                <div class="col-md-5">
+                    <h1 id="logo">BATTLESHIPS</h1>
+                </div>
+            </div>
             <div class="row justify-content-center">
                 <div class="col-md-5">
                     <a href="#" class="btn btn-primary btn-lg" data-toggle="modal"
@@ -104,23 +117,239 @@
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-<script src="/socket.io/socket.io.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"
-        integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
-        crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"
-        integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
-        crossorigin="anonymous"></script>
-<script src="./rangeslider.min.js"></script>
-<script src="./toastr.min.js"></script>
-<script src="./colorSelect.js"></script>
-<script src="./HoldOn.min.js"></script>
-<script src="./settings.js"></script>
-<script src="./main.js"></script>
-<script type="text/javascript">
-    $('input[type="range"]').rangeslider({polyfill: false});
-    $('select[name="colorpicker"]').colorSelect();
-</script>
+<div class="container-fluid" id="game" style="display: none">
+    <div class="row-fluid">
+        <div class="centering text-center">
+            <div class="row justify-content-center">
+                <div class="col-md-5">
+                    <h1>Playing against <span id="enemy"></span></h1>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-md-5 game-info">
+                    <h3>Place your battleships!</h3>
+                    <h1>02:00</h1>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-md-2 offset-md-2 text-left">
+                    <div class="alert alert-info" role="alert">
+                        Choose ship and click on it, then you can place it into battlefield.
+                    </div>
+                    <div class="ships">
+                        <span class="shipNumber">1x </span>
+                        <div class="ship largeShip">
+                            <div class="shipBlock"></div>
+                            <div class="shipBlock"></div>
+                            <div class="shipBlock"></div>
+                            <div class="shipBlock"></div>
+                        </div>
+                        2x
+                        <div class="ship bigShip">
+                            <div class="shipBlock"></div>
+                            <div class="shipBlock"></div>
+                            <div class="shipBlock"></div>
+                        </div>
+                        3x
+                        <div class="ship mediumShip">
+                            <div class="shipBlock"></div>
+                            <div class="shipBlock"></div>
+                        </div>
+                        4x
+                        <div class="ship smallShip">
+                            <div class="shipBlock"></div>
+                        </div>
+                        <br>
+                    </div>
+                    <div class="bottomdiv">
+                        <a href="#" class="btn btn-primary btn-lg">Place randomly</a>
+                    </div>
+                </div>
+                <div class="col-md-5 text-left">
+                    <div class="battlefield">
+                        <table>
+                            <tr id="row1">
+                                <td class="col1"></td>
+                                <td class="col2"></td>
+                                <td class="col3"></td>
+                                <td class="col4"></td>
+                                <td class="col5"></td>
+                                <td class="col6"></td>
+                                <td class="col7"></td>
+                                <td class="col8"></td>
+                                <td class="col9"></td>
+                                <td class="col10"></td>
+                            </tr>
+                            <tr id="row2">
+                                <td class="col1"></td>
+                                <td class="col2"></td>
+                                <td class="col3"></td>
+                                <td class="col4"></td>
+                                <td class="col5"></td>
+                                <td class="col6"></td>
+                                <td class="col7"></td>
+                                <td class="col8"></td>
+                                <td class="col9"></td>
+                                <td class="col10"></td>
+                            </tr>
+                            <tr id="row3">
+                                <td class="col1"></td>
+                                <td class="col2"></td>
+                                <td class="col3"></td>
+                                <td class="col4"></td>
+                                <td class="col5"></td>
+                                <td class="col6"></td>
+                                <td class="col7"></td>
+                                <td class="col8"></td>
+                                <td class="col9"></td>
+                                <td class="col10"></td>
+                            </tr>
+                            <tr id="row4">
+                                <td class="col1"></td>
+                                <td class="col2"></td>
+                                <td class="col3"></td>
+                                <td class="col4"></td>
+                                <td class="col5"></td>
+                                <td class="col6"></td>
+                                <td class="col7"></td>
+                                <td class="col8"></td>
+                                <td class="col9"></td>
+                                <td class="col10"></td>
+                            </tr>
+                            <tr id="row5">
+                                <td class="col1"></td>
+                                <td class="col2"></td>
+                                <td class="col3"></td>
+                                <td class="col4"></td>
+                                <td class="col5"></td>
+                                <td class="col6"></td>
+                                <td class="col7"></td>
+                                <td class="col8"></td>
+                                <td class="col9"></td>
+                                <td class="col10"></td>
+                            </tr>
+                            <tr id="row6">
+                                <td class="col1"></td>
+                                <td class="col2"></td>
+                                <td class="col3"></td>
+                                <td class="col4"></td>
+                                <td class="col5"></td>
+                                <td class="col6"></td>
+                                <td class="col7"></td>
+                                <td class="col8"></td>
+                                <td class="col9"></td>
+                                <td class="col10"></td>
+                            </tr>
+                            <tr id="row7">
+                                <td class="col1"></td>
+                                <td class="col2"></td>
+                                <td class="col3"></td>
+                                <td class="col4"></td>
+                                <td class="col5"></td>
+                                <td class="col6"></td>
+                                <td class="col7"></td>
+                                <td class="col8"></td>
+                                <td class="col9"></td>
+                                <td class="col10"></td>
+                            </tr>
+                            <tr id="row8">
+                                <td class="col1"></td>
+                                <td class="col2"></td>
+                                <td class="col3"></td>
+                                <td class="col4"></td>
+                                <td class="col5"></td>
+                                <td class="col6"></td>
+                                <td class="col7"></td>
+                                <td class="col8"></td>
+                                <td class="col9"></td>
+                                <td class="col10"></td>
+                            </tr>
+                            <tr id="row9">
+                                <td class="col1"></td>
+                                <td class="col2"></td>
+                                <td class="col3"></td>
+                                <td class="col4"></td>
+                                <td class="col5"></td>
+                                <td class="col6"></td>
+                                <td class="col7"></td>
+                                <td class="col8"></td>
+                                <td class="col9"></td>
+                                <td class="col10"></td>
+                            </tr>
+                            <tr id="row10">
+                                <td class="col1"></td>
+                                <td class="col2"></td>
+                                <td class="col3"></td>
+                                <td class="col4"></td>
+                                <td class="col5"></td>
+                                <td class="col6"></td>
+                                <td class="col7"></td>
+                                <td class="col8"></td>
+                                <td class="col9"></td>
+                                <td class="col10"></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-md-8 chat text-left">
+                    <div class="messages">
+                        <div class="message">
+                            <strong>[16:34] Trsak</strong>: nojooo
+                        </div>
+                        <div class="message">
+                            <strong>[16:34] Trsak</strong>: nojooo
+                        </div>
+                        <div class="message">
+                            <strong>[16:34] Trsak</strong>: nojooo
+                        </div>
+                        <div class="message">
+                            <strong>[16:34] Trsak</strong>: nojooo
+                        </div>
+                        <div class="message">
+                            <strong>[16:34] Trsak</strong>: nojooo
+                        </div>
+                        <div class="message">
+                            <strong>[16:34] Trsak</strong>: nojooo
+                        </div>
+                        <div class="message">
+                            <strong>[16:34] Trsak</strong>: nojooo
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-md-8 newMessage">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Write a message..."
+                               aria-label="Write a message...">
+                        <span class="input-group-btn">
+                                <button class="btn btn-primary" type="button">Send</button>
+                            </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"
+            integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"
+            integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
+            crossorigin="anonymous"></script>
+    <script src="./rangeslider.min.js"></script>
+    <script src="./toastr.min.js"></script>
+    <script src="./colorSelect.js"></script>
+    <script src="./HoldOn.min.js"></script>
+    <script src="./settings.js"></script>
+    <script src="./main.js"></script>
+    <script type="text/javascript">
+        $('input[type="range"]').rangeslider({polyfill: false});
+        $('select[name="colorpicker"]').colorSelect();
+    </script>
 </body>
 </html>

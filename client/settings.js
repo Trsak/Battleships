@@ -15,3 +15,9 @@ toastr.options = {
     "showMethod": "fadeIn",
     "hideMethod": "fadeOut"
 };
+
+$(window).resize(function () {
+    var width = $('.battlefield .col-1').first().width();
+    $('.battlefield .col-1').height(width);
+    console.log(width);
+});
