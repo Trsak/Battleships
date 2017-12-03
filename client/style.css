@@ -122,20 +122,36 @@ html, body {
     padding-bottom: 10px;
 }
 
+#enemyBF td:hover {
+    background-color: #117299;
+}
+
+#enemyBF td.shot:hover {
+    background-color: #1591c1;
+}
+
 .battlefield table {
-    border: 1px solid #3c3c3c;
+    cursor: pointer;
+    border-collapse: collapse;
 }
 
 .battlefield td {
     width: 45px;
     height: 45px;
-    position: relative;
     background-color: #1591c1;
     border: 1px solid #3c3c3c;
+    text-align: center;
+    font-size: 25px;
+}
+
+.shipWhole {
+    width: 100%;
+    display: flex;
 }
 
 .ship {
     display: flex;
+    float: left;
     cursor: pointer;
 }
 
@@ -148,6 +164,14 @@ html, body {
     background-color: #949f86;
     border: 1px solid #3c3c3c;
     border-left: none;
+}
+
+.ship:hover .shipBlock {
+    background-color: #6e867e;
+}
+
+.shop:hover .shipBlock {
+    background-color: #6e867e;
 }
 
 .shipBlock:first-child {
@@ -208,7 +232,7 @@ html, body {
     border-color: #127ba3;
 }
 
-#logo {
+#logo a {
     font-family: 'Baloo Tamma', cursive;
     color: #fff;
     font-size: 80px;
@@ -228,11 +252,14 @@ html, body {
     0 20px 20px #158CBA;
 }
 
+#logo a:hover {
+    text-decoration: none;
+}
+
 @media (min-width: 768px) {
     .bottomdiv {
         width: 100%;
         position: absolute;
-        left: 0;
         bottom: 0;
     }
 }

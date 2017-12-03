@@ -20,8 +20,8 @@ var helpers = require("./helpers");
 var sessionMiddleware = session({
     store: new RedisStore({client: client}),
     secret: "xXBattleshipsXx",
-    saveUninitialized: false,
-    resave: false,
+    saveUninitialized: true,
+    resave: true,
     expires: false
 });
 
@@ -39,10 +39,13 @@ app.use('/', express.static(__dirname + '/client'));
 
 var playersTotal = 0;
 var playersInQue = [];
+var privateGames = [];
 
 sio.sockets.on("connection", function (socket) {
     var socketSession = socket.request.session;
     var opponent = null;
+    var gameInfo;
+    resetGame();
 
     if (!socketSession.created) {
         ++playersTotal;
@@ -53,18 +56,22 @@ sio.sockets.on("connection", function (socket) {
         socketSession.color = "#5484ed";
         socketSession.save();
     }
+    else {
+        if (opponent) {
+            sio.to(opponent).emit("enemyLeft");
+            opponent = null;
+        }
+    }
 
     socket.emit('connected', {data: socketSession});
 
     socket.on('disconnect', function () {
-        console.log("dced ");
-        if (opponent) console.log(opponent.toString());
-        if (playersInQue.indexOf(socket) !== -1) {
-            playersInQue.remove(socket);
+        if (playersInQue.indexOf(socket.id) !== -1) {
+            playersInQue.remove(socket.id);
         }
 
         if (opponent) {
-            opponent.emit("enemyLeft");
+            sio.to(opponent).emit("enemyLeft");
             opponent = null;
         }
     });
@@ -77,38 +84,160 @@ sio.sockets.on("connection", function (socket) {
         socketSession.save();
     });
 
+    socket.on('createGame', function (id) {
+        privateGames.push({player: socket.id, id: id});
+    });
+
+    socket.on('findGame', function (id) {
+        resetGame();
+
+        for (i = 0; i < privateGames.length; i++) {
+            if (privateGames[i].id === id) {
+                var opponent = privateGames[i].player;
+                privateGames.splice(i, 1);
+
+
+                var opponentSession = sio.sockets.connected[opponent].request.session;
+
+                sio.to(opponent).emit("startGame", {
+                    enemy: {id: socket.id, username: socketSession.username, color: socketSession.color},
+                    starter: (gameInfo.start === 1 ? socket.id : sio.sockets.connected[opponent].id)
+                });
+
+                socket.emit("startGame", {
+                    enemy: {
+                        id: sio.sockets.connected[opponent].id,
+                        username: opponentSession.username,
+                        color: opponentSession.color
+                    },
+                    starter: (gameInfo.start === 1 ? socket.id : sio.sockets.connected[opponent].id)
+                });
+                return;
+            }
+        }
+
+        socket.emit("gameError", "Game #" + id + " not found!");
+    });
+
+    socket.on('newMessage', function (message) {
+        sio.to(opponent).emit("newMessage", message);
+    });
+
+    socket.on('newServerMessage', function (code) {
+        var message;
+
+        switch (code) {
+            case 0:
+                message = "<span style='color: " + socketSession.color + ";'>" + socketSession.username + "</span> has joined the game!";
+                break;
+            case 1:
+                message = "<span style='color: " + socketSession.color + ";'>" + socketSession.username + "</span> has been marked as ready!";
+                gameInfo.ready = true;
+                break;
+            case 2:
+                message = "<span style='color: " + socketSession.color + ";'>" + socketSession.username + "</span> has been marked as unready!";
+                gameInfo.ready = false;
+                break;
+        }
+
+        sio.to(opponent).emit("newServerMessage", message, code);
+    });
+
+    socket.on('shot', function (row, col) {
+        sio.to(opponent).emit("shot", row, col);
+    });
+
+    socket.on('setOpponent', function (id) {
+        opponent = id;
+    });
+
+    socket.on('setOpponentReady', function (state) {
+        gameInfo.opponentReady = state;
+        readyToStart();
+    });
+
     socket.on('joinQue', function () {
+        resetGame();
+
         if (playersInQue.length > 0) {
             opponent = playersInQue[0];
-            opponent.opponent = socket;
-            
+
             playersInQue.remove(socket);
             playersInQue.remove(opponent);
 
-            var opponentSession = opponent.request.session;
+            var opponentSession = sio.sockets.connected[opponent].request.session;
 
-            opponent.emit("startGame", {
-                enemy: {username: socketSession.username, color: socketSession.color},
-                phase: 0
+            sio.to(opponent).emit("startGame", {
+                enemy: {id: socket.id, username: socketSession.username, color: socketSession.color},
+                starter: (gameInfo.start === 1 ? socket.id : sio.sockets.connected[opponent].id)
             });
+
             socket.emit("startGame", {
-                enemy: {username: opponentSession.username, color: opponentSession.color},
-                phase: 0
+                enemy: {
+                    id: sio.sockets.connected[opponent].id,
+                    username: opponentSession.username,
+                    color: opponentSession.color
+                },
+                starter: (gameInfo.start === 1 ? socket.id : sio.sockets.connected[opponent].id)
             });
         }
-        else if (playersInQue.indexOf(socket) === -1) {
-            playersInQue.push(socket);
+        else if (playersInQue.indexOf(socket.id) === -1) {
+            playersInQue.push(socket.id);
         }
     });
 
     socket.on('leaveQue', function () {
-        playersInQue.remove(socket);
+        playersInQue.remove(socket.id);
     });
 
     socket.on('leaveQue', function () {
-        playersInQue.remove(socket);
+        playersInQue.remove(socket.id);
     });
+
+    socket.on('placedShips', function (battlefield) {
+        socket.emit("newServerMessage", "Game has started!", 0);
+        sio.to(opponent).emit("placedShips", battlefield);
+    });
+
+    socket.on('wonGame', function (winner) {
+        socket.emit("wonGame", winner);
+        sio.to(opponent).emit("wonGame", winner);
+    });
+
+    socket.on('gameError', function (stage, error) {
+        resetGame();
+
+        var message;
+        var messageOpponent;
+
+        switch (error) {
+            case 0:
+                if (stage === 1) {
+                    message = "You didn't place all the ships ships in time!";
+                    messageOpponent = socketSession.username + " didn't place all the ships in time!";
+                } else if (stage === 2) {
+                    message = "You didn't shoot in time!";
+                    messageOpponent = socketSession.username + " didn't shoot in time!";
+                }
+                break;
+        }
+
+        sio.to(opponent).emit("gameError", messageOpponent);
+        socket.emit("gameError", message);
+    });
+
+    function resetGame() {
+        gameInfo = {ready: false, opponentReady: false, start: (1 + Math.floor(Math.random() * 2))};
+    }
+
+    function readyToStart() {
+        if (gameInfo.ready === true && gameInfo.opponentReady === true) {
+            socket.emit("readyToPlay");
+            sio.to(opponent).emit("readyToPlay");
+        }
+    }
 });
+
 
 server.listen(port, function () {
     console.log('Battleships game running on port ' + port);
