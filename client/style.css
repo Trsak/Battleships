@@ -102,7 +102,7 @@ html, body {
 
 #holdon-content {
     width: 400px;
-    margin: -76px 0 0 -200px;
+    margin: -115px 0 0 -200px;
     font-size: 32px;
 }
 
@@ -241,7 +241,7 @@ html, body {
     color: #fff;
     font-size: 80px;
     letter-spacing: 5px;
-    margin: 0px auto 30px;
+    margin: 0 auto 30px;
     text-shadow: 0 1px 0 #ccc,
     0 2px 0 #c9c9c9,
     0 3px 0 #bbb,
@@ -260,6 +260,14 @@ html, body {
     text-decoration: none;
 }
 
+.sendLink {
+    margin-top: 45px;
+}
+
+.searchingOpponent {
+    margin-top: 25px;
+}
+
 @media (min-width: 768px) {
     .bottomdiv {
         width: 100%;
@@ -269,8 +277,29 @@ html, body {
 }
 
 @media (max-width: 767px) {
-    #logo {
-        font-size: 52px;
+    #logo a {
+        font-size: 42px;
+    }
+
+    .battlefield table {
+        margin: 0 auto;
+    }
+
+    #enemyBF {
+        margin-bottom: 5px;
+    }
+
+    .sendLink {
+        font-size: 20px;
+    }
+
+    .game-info {
+        padding-bottom: 0;
+    }
+
+    #inviteLink {
+        width: 80%;
+        margin: 0 auto;
     }
 
     .modal-dialog {
@@ -285,10 +314,13 @@ html, body {
     .battlefield td {
         width: 30px;
         height: 30px;
+        font-size: 18px;
     }
 
     .ships {
         display: flex;
+        padding-top: 5px;
+        padding-bottom: 5px;
     }
 
     .ship {
@@ -298,7 +330,7 @@ html, body {
 
     #game h1 {
         font-size: 24px;
-        padding-bottom: 8px;
+        padding-bottom: 0;
     }
 
     #game h3 {
@@ -308,4 +340,10 @@ html, body {
     .btn {
         margin-top: 2px;
     }
+
+    .btn-lg {
+        font-size: 12px;
+        margin-bottom: 2px;
+    }
+
 }

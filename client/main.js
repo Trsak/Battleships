@@ -670,8 +670,8 @@ $(function () {
     });
 
     socket.on("readyToPlay", function () {
-        stage = 2;
         renewBattlefield();
+        stage = 2;
 
         if (shooting) {
             shot(null, null);
@@ -737,7 +737,7 @@ $(function () {
 
         var options = {
             theme: "custom",
-            content: "<div class='col'><h1 class='winner'><span style='color: " + color + ";'>" + player + "</span> </h1><div class='h5'>" + message + "</div></div>",
+            content: "<div class='col'><div class='h5'>WINNER</div><h1 class='winner'><span style='color: " + color + ";'>" + player + "</span> </h1><div class='h5'>" + message + "</div></div>",
             message: '<button type="button" class="btn btn-secondary" id="endGame">Close</button>',
             backgroundColor: "#bde1fd",
             textColor: "white"
@@ -867,7 +867,7 @@ $(function () {
 
         var options = {
             theme: "custom",
-            content: "<div class='col'>Send this link to you friend <input value='" + url + id + "' id='inviteLink' class='form-control' type='text' readonly></div>",
+            content: "<div class='col sendLink'>Send this link to your friend <input value='" + url + id + "' id='inviteLink' class='form-control' type='text' readonly></div>",
             message: '<button type="button" class="btn btn-primary copy" data-clipboard-target="#inviteLink">Copy link</button> ' +
             '<button id="cancelPrivate" type="button" class="btn btn-secondary">Cancel</button>',
             backgroundColor: "#bde1fd",
@@ -890,7 +890,7 @@ $(function () {
     $("#newGameRandom").click(function () {
         var options = {
             theme: "custom",
-            content: "<div class='col'>Searching for opponent<div class='searchingTime'><span id='countMins'>00</span>:<span id='countSec'>00</span></div></div>",
+            content: "<div class='col searchingOpponent'>Searching for opponent<div class='searchingTime'><span id='countMins'>00</span>:<span id='countSec'>00</span></div></div>",
             message: '<button type="button" class="btn btn-secondary" data-dismiss="modal" id="newGameCancel">Cancel searching</button>',
             backgroundColor: "#bde1fd",
             textColor: "white"
@@ -978,11 +978,6 @@ $(function () {
                     }
                 }
             }
-        } else {
-            var id = $(this).parent('tr')[0].id;
-            if (id.indexOf("enemyRow") !== -1) {
-
-            }
         }
     });
 
@@ -1047,7 +1042,9 @@ $(function () {
     });
 
     $(".battlefield").mouseout(function () {
-        renewBattlefield();
+        if (stage === 1) {
+            renewBattlefield();
+        }
     });
 
     $("#enemyBF").mouseout(function () {
