@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="colorSelect.css">
     <link rel="stylesheet" href="tipped.css">
     <link rel="stylesheet" href="HoldOn.min.css">
+    <link rel="stylesheet" href="pyro.css">
     <link href="style.css" rel="stylesheet">
 </head>
 <body>
@@ -130,7 +131,7 @@
             <div class="row justify-content-center">
                 <div class="col-md-5 game-info">
                     <h3 id="gameInstruction">Place your battleships!</h3>
-                    <h1><span id="countdownMins">02</span>:<span id="countdownSec">00</span></h1>
+                    <h1 id="countDown"><span id="countdownMins">02</span>:<span id="countdownSec">00</span></h1>
                 </div>
             </div>
             <div class="row justify-content-center">
@@ -263,7 +264,9 @@
                 <div id="placingDiv" class="col-md-2 offset-md-2 text-left">
                     <div class="row">
                         <div class="col-12">
-                            <button id="readyBtn" onclick="readyChange();" class="btn btn-success btn-lg" disabled>Mark as ready</button>
+                            <button id="readyBtn" onclick="readyChange();" class="btn btn-success btn-lg" disabled>Mark
+                                as ready
+                            </button>
                         </div>
                     </div>
                     <div class="ships">
@@ -450,13 +453,15 @@
             </div>
             <div class="row justify-content-center">
                 <div class="col-md-8 newMessage">
+                    <form onsubmit="addMessage();return false;">
                     <div class="input-group">
-                        <input id="msgInput" type="text" class="form-control" placeholder="Write a message..."
-                               aria-label="Write a message...">
-                        <span class="input-group-btn">
-                                <button onclick="addMessage();" class="btn btn-primary" type="button">Send</button>
+                            <input id="msgInput" name="dsad54s%_a654d5as4d56as4sa_" autocomplete="off" type="text" class="form-control" placeholder="Write a message..."
+                                   aria-label="Write a message...">
+                            <span class="input-group-btn">
+                                <button onsubmit="addMessage();return false;" class="btn btn-primary" type="button">Send</button>
                             </span>
                     </div>
+                </form>
                 </div>
             </div>
         </div>

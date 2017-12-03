@@ -43,6 +43,7 @@ var privateGames = [];
 
 sio.sockets.on("connection", function (socket) {
     var socketSession = socket.request.session;
+    var createdPrivate = false;
     var opponent = null;
     var gameInfo;
     resetGame();
@@ -61,6 +62,11 @@ sio.sockets.on("connection", function (socket) {
             sio.to(opponent).emit("enemyLeft");
             opponent = null;
         }
+
+        if (createdPrivate) {
+            cancelPrivateGame();
+            createdPrivate = false;
+        }
     }
 
     socket.emit('connected', {data: socketSession});
@@ -74,6 +80,11 @@ sio.sockets.on("connection", function (socket) {
             sio.to(opponent).emit("enemyLeft");
             opponent = null;
         }
+
+        if (createdPrivate) {
+            cancelPrivateGame();
+            createdPrivate = false;
+        }
     });
 
     socket.on('settingsChanged', function (data) {
@@ -86,6 +97,11 @@ sio.sockets.on("connection", function (socket) {
 
     socket.on('createGame', function (id) {
         privateGames.push({player: socket.id, id: id});
+        createdPrivate = true;
+    });
+
+    socket.on('cancelPrivate', function () {
+        cancelPrivateGame();
     });
 
     socket.on('findGame', function (id) {
@@ -228,6 +244,16 @@ sio.sockets.on("connection", function (socket) {
 
     function resetGame() {
         gameInfo = {ready: false, opponentReady: false, start: (1 + Math.floor(Math.random() * 2))};
+    }
+
+    function cancelPrivateGame() {
+        for (i = 0; i < privateGames.length; i++) {
+            if (privateGames[i].player === socket.id) {
+                privateGames.splice(i, 1);
+                createdPrivate = false;
+                return;
+            }
+        }
     }
 
     function readyToStart() {

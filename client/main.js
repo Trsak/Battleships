@@ -36,7 +36,6 @@ function checkForWin() {
         }
     }
 
-    console.log(left);
     if (left === 0) {
         socket.emit("wonGame", socket.id);
     }
@@ -222,6 +221,18 @@ function restoreField() {
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     ];
+
+    for (x = 1; x <= 10; x++) {
+        for (i = 1; i <= 10; i++) {
+            var bf = $("#row" + x + " .col" + i);
+            var enemyBf = $("#enemyRow" + x + " .col" + i);
+
+            bf.html("");
+            bf.css("background-color", "");
+            enemyBf.html("");
+            enemyBf.css("background-color", "");
+        }
+    }
 
     renewBattlefield();
 }
@@ -528,11 +539,16 @@ function canPlaceShip(row, col) {
 function updateCountdown() {
     var secElement = $("#countdownSec");
     var minsElement = $("#countdownMins");
+    var countDownElement = $("#countDown");
+    if (countdownSec > 5) {
+        countDownElement.css('color', '#3c3c3c');
+    }
 
     if (countdownSec === 0) {
         countdownSec = 59;
 
         if (countdownMins === 0) {
+
             if (stage === 1) {
                 var left = 0;
 
@@ -540,14 +556,20 @@ function updateCountdown() {
                     left += shipsLeft[i];
                 }
 
-                if (left !== 0) {
-                    socket.emit("gameError", stage, 0);
-                } else {
-                    socket.emit('newServerMessage', 1);
+                if (stage !== 3) {
+                    if (left !== 0) {
+                        socket.emit("gameError", stage, 0);
+                    } else {
+                        socket.emit('newServerMessage', 1);
+                    }
                 }
             }
             else {
-                socket.emit("gameError", stage, 0);
+                if (stage !== 3) {
+                    if (shooting) {
+                        socket.emit("gameError", stage, 0);
+                    }
+                }
             }
         }
 
@@ -559,6 +581,11 @@ function updateCountdown() {
 
     secElement.text(("0" + countdownSec).slice(-2));
     minsElement.text(("0" + countdownMins).slice(-2));
+
+    if (countdownSec <= 5 && countdownMins === 0) {
+        countDownElement.animateCss('pulse');
+        countDownElement.css('color', '#ff4b46');
+    }
 }
 
 function updateCounting() {
@@ -587,12 +614,32 @@ $(function () {
         if (id) {
             socket.emit("findGame", id);
         }
-        location.hash.replace('#','');
+        location.hash.replace('#', '');
         location.hash = '';
     });
 
     socket.on("startGame", function (game) {
+        if (ready === true) {
+            readyChange();
+        }
+
+        if (countdownTimer) {
+            clearInterval(countdownTimer);
+        }
+
+        if (countingTimer) {
+            clearInterval(countingTimer);
+        }
+
+        if (shipDirection === 2) {
+            changeDirection();
+        }
+
         stage = 1;
+        enemyBattlefield = null;
+        ready = false;
+        shooting = true;
+        restoreField();
 
         socket.emit('setOpponent', game.enemy.id);
 
@@ -603,6 +650,8 @@ $(function () {
         shooting = game.starter === socket.id;
 
         $("#mainMenu").hide();
+        $("#enemyBF").hide();
+        $("#placingDiv").show();
         $("#game").show();
 
         var enemy = $("#enemy");
@@ -622,6 +671,8 @@ $(function () {
 
     socket.on("readyToPlay", function () {
         stage = 2;
+        renewBattlefield();
+
         if (shooting) {
             shot(null, null);
         }
@@ -633,7 +684,10 @@ $(function () {
 
     socket.on("shot", function (row, col) {
         shooting = true;
-        $("#gameInstruction").html("You are shooting!");
+        var instructions = $("#gameInstruction");
+
+        instructions.html("You are shooting!");
+        instructions.animateCss('tada');
 
         if (countdownTimer) {
             clearInterval(countdownTimer);
@@ -655,32 +709,39 @@ $(function () {
     });
 
     socket.on("wonGame", function (winner) {
-        console.log("won");
         $("#game").hide();
         $("#mainMenu").show();
 
+        stage = 3;
+
         var player;
+        var color;
+        var message;
 
         if (socket.id === winner) {
             player = userData.username;
             color = userData.color;
+            message = "You have won!";
+
+            $("body").prepend("<div class=\"pyro\"><div class=\"before\"></div><div class=\"after\"></div></div>");
         }
         else {
             player = opponent.username;
             color = opponent.color;
+            message = "You have been defeated!";
         }
-
-        var options = {
-            theme: "custom",
-            content: "<div class='col'><span style='color: " + color + ";'>" + player + "</span> IS THE WINNER!<div class='h5'>Winner winner chicken dinner!</div></div>",
-            message: '<button type="button" class="btn btn-secondary" id="endGame">Close</button>',
-            backgroundColor: "#bde1fd",
-            textColor: "white"
-        };
 
         if (countdownTimer) {
             clearInterval(countdownTimer);
         }
+
+        var options = {
+            theme: "custom",
+            content: "<div class='col'><h1 class='winner'><span style='color: " + color + ";'>" + player + "</span> </h1><div class='h5'>" + message + "</div></div>",
+            message: '<button type="button" class="btn btn-secondary" id="endGame">Close</button>',
+            backgroundColor: "#bde1fd",
+            textColor: "white"
+        };
 
         HoldOn.open(options);
     });
@@ -689,7 +750,8 @@ $(function () {
         var dt = new Date();
         var box = $("#msgBox");
 
-        box.append("<div class=\"message\"><strong>[" + dt.getHours() + ":" + dt.getMinutes() + "] " +
+
+        box.append("<div class=\"message\"><strong>[" + ("0" + dt.getHours()).slice(-2) + ":" + ("0" + dt.getMinutes()).slice(-2) + "] " +
             "<span style='color: " + opponent.color + ";'>" + opponent.username + "</span></strong>: " + message + "</div>");
         box.scrollTop(box[0].scrollHeight);
     });
@@ -707,7 +769,7 @@ $(function () {
                 break;
         }
 
-        box.append("<div class=\"message\"><strong>[" + dt.getHours() + ":" + dt.getMinutes() + "] " + message + "</div>");
+        box.append("<div class=\"message\"><strong>[" + ("0" + dt.getHours()).slice(-2) + ":" + ("0" + dt.getMinutes()).slice(-2) + "] " + message + "</div>");
         box.scrollTop(box[0].scrollHeight);
     });
 
@@ -728,19 +790,23 @@ $(function () {
     });
 
     socket.on("gameError", function (message) {
-        $("#game").hide();
-        $("#mainMenu").show();
+        if (stage === 1 || stage === 2) {
+            $("#game").hide();
+            $("#mainMenu").show();
 
-        toastr.error(message);
-        opponent = null;
+            toastr.error(message);
+            opponent = null;
+        }
     });
 
     socket.on("enemyLeft", function () {
-        $("#game").hide();
-        $("#mainMenu").show();
+        if (stage === 1 || stage === 2) {
+            $("#game").hide();
+            $("#mainMenu").show();
 
-        toastr.error(opponent.username + " has left the game.");
-        opponent = null;
+            toastr.error(opponent.username + " has left the game.");
+            opponent = null;
+        }
     });
 
     $("#settingsSave").click(function () {
@@ -776,6 +842,11 @@ $(function () {
         }
     });
 
+    $(document).on("click", "button#cancelPrivate", function () {
+        HoldOn.close();
+        socket.emit("cancelPrivate");
+    });
+
     $(document).on("click", "button#newGameCancel", function () {
         HoldOn.close();
         if (countingTimer) {
@@ -785,6 +856,7 @@ $(function () {
     });
 
     $(document).on("click", "button#endGame", function () {
+        $(".pyro").remove();
         HoldOn.close();
     });
 
@@ -796,7 +868,8 @@ $(function () {
         var options = {
             theme: "custom",
             content: "<div class='col'>Send this link to you friend <input value='" + url + id + "' id='inviteLink' class='form-control' type='text' readonly></div>",
-            message: '<button type="button" class="btn btn-primary copy" data-clipboard-target="#inviteLink">Copy link</button> <button id="ba" type="button" class="btn btn-secondary>Cancel</button>',
+            message: '<button type="button" class="btn btn-primary copy" data-clipboard-target="#inviteLink">Copy link</button> ' +
+            '<button id="cancelPrivate" type="button" class="btn btn-secondary">Cancel</button>',
             backgroundColor: "#bde1fd",
             textColor: "white"
         };
@@ -939,16 +1012,20 @@ $(function () {
                 if (shooting) {
                     var colElement = $("#enemyRow" + row + " .col" + col);
 
+                    if (colElement.hasClass("shot")) {
+                        return;
+                    }
+
                     colElement.addClass("shot");
                     shots[row - 1][col - 1] = 1;
 
                     if (enemyBattlefield[row - 1][col - 1] === 1) {
                         colElement.css("background-color", "#ff4b46");
-                        colElement.html("<i class=\"fa fa-times\" aria-hidden=\"true\"></i>");
                         enemyBattlefield[row - 1][col - 1] = 0;
                         checkForWin();
                     }
 
+                    colElement.html("<i class=\"fa fa-times\" aria-hidden=\"true\"></i>");
                     shot(row, col);
                 }
             }
@@ -967,6 +1044,10 @@ $(function () {
                 }
             }
         }
+    });
+
+    $(".battlefield").mouseout(function () {
+        renewBattlefield();
     });
 
     $("#enemyBF").mouseout(function () {

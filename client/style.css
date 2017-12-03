@@ -64,6 +64,10 @@ html, body {
     padding-top: 20px;
 }
 
+.winner {
+    font-size: 70px;
+}
+
 .footer {
     position: absolute;
     bottom: 0;
